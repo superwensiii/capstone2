@@ -38,12 +38,12 @@ if (session_status() === PHP_SESSION_NONE) {
 
                 <!-- Icons -->
                  <style> .dropdown-menu .d-flex img {
-    border: 1px solid #ddd;
-}
-.dropdown-menu .d-flex small {
-    font-size: 12px;
-}
-</style>
+                          border: 1px solid #ddd;
+                            }
+                          .dropdown-menu .d-flex small {
+                          font-size: 12px;
+                            }
+                 </style>
                 <li class="nav-item dropdown me-3">
     <a class="nav-link text-dark" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
         <i class="fas fa-bell fs-5"></i>
@@ -156,12 +156,7 @@ function addToCart(button) {
         button.closest('form').submit();
     });
 }
-
-
-
-
 </script>
-
 <style>
     #cart-count {
     font-size: 0.75rem;
@@ -173,16 +168,7 @@ function addToCart(button) {
     color: white;
     padding: 2px;
 }
-
 </style>
-
-
-                <li class="nav-item me-3">
-                    <a class="nav-link text-dark" href="#" aria-label="Wishlist">
-                        <i class="fas fa-heart fs-5"></i>
-                    </a>
-                </li>
-
                 <!-- User Section -->
 
                 <?php if (isset($_SESSION['user_id'])): ?>
@@ -211,12 +197,12 @@ function addToCart(button) {
             </ul>
         </div>
     </div>
+</nav> 
+</body>            
+          </ul>
+        </div>
+    </div>
 </nav>
-
-<!-- Cart Sidebar -->
-
-
-
 <!-- FontAwesome and Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://kit.fontawesome.com/your-fontawesome-key.js" crossorigin="anonymous"></script>
@@ -295,7 +281,6 @@ function addToCart(button) {
 .search-box-container .btn {
     border-width: 2px;
 }
-
   </style>
   <div class="search-box-container bg-light py-3">
     <div class="container">
@@ -320,8 +305,6 @@ function addToCart(button) {
 </div>
 
 <script src="js/cart.js"></script>
-
-
 <?php
 include 'db/connect.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_box'])) {
@@ -347,7 +330,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_box'])) {
       $products = [];
   }
 }
-
 // Avoid closing the connection prematurely; move `$conn->close()` to the end of the script if needed.
 ?>
 

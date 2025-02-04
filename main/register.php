@@ -42,9 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Close the connection
 $conn->close();
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -53,84 +51,16 @@ $conn->close();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registration Form</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f1f3f5;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container-fluid {
-      display: flex;
-      min-height: 100vh;
-      align-items: center;
-      justify-content: center;
-      background-color: #f9fafb;
-    }
-
-    .left-section {
-      background: linear-gradient(135deg, #4a90e2, #007bff);
-      color: #fff;
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      padding: 50px;
-      text-align: center;
-      border-radius: 10px 0 0 10px;
-    }
-
-    .left-section h1 {
-      font-size: 36px;
-      font-weight: bold;
-    }
-
-    .right-section {
-      flex: 2;
-      background-color: #fff;
-      padding: 50px;
-      border-radius: 0 10px 10px 0;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .form-label {
-      font-weight: bold;
-    }
-
-    .btn-primary {
-      background-color: #4a90e2;
-      border: none;
-      transition: background-color 0.3s;
-    }
-
-    .btn-primary:hover {
-      background-color: #007bff;
-    }
-
-    .btn-secondary {
-      background-color: #f1f3f5;
-      border: 1px solid #ccc;
-      color: #333;
-      transition: background-color 0.3s;
-    }
-
-    .btn-secondary:hover {
-      background-color: #ddd;
-    }
-  </style>
+  <link rel="stylesheet" href="../css/register.css">
 </head>
 <body>
 
-<div class="container-fluid">
-  <div class="row w-100">
-    <!-- Left Section -->
-    
-
-    <!-- Right Section -->
-    <div class="col-md-8 right-section">
-      <h3 class="mb-4">Create an Account</h3>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h3>Create an Account</h3>
+    </div>
+    <div class="card-body">
       <form action="register.php" method="POST">
         <div class="row mb-3">
           <div class="col-md-6">
@@ -143,33 +73,138 @@ $conn->close();
           </div>
         </div>
         <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="phone" class="form-label">Phone Number</label>
-            <input type="text" class="form-control" id="phone" name="phone" required>
-          </div>
+        <div class="container my-5">
+    <form id="otp-form" method="POST" action="sms_otp.php">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phone" name="phone" placeholder="639XXXXXXXXX" required>
+            </div>
+        </div>
+
+        <button type="button" id="send-otp-btn" class="btn btn-primary mt-3">Send OTP</button>
+
+        <div id="otp-section" class="mt-3" style="display: none;">
+            <label for="otp" class="form-label">Enter OTP</label>
+            <input type="text" id="otp" class="form-control mb-2" placeholder="Enter OTP" required>
+            <button type="button" id="validate-otp-btn" class="btn btn-success mt-2">Validate OTP</button>
+            <p id="timer" class="text-danger mt-2"></p>
+        </div>
+
+        <p id="otp-result" class="mt-3"></p>
+    </form>
+</div>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.getElementById('send-otp-btn').addEventListener('click', async function () {
+    let phoneNumber = document.getElementById('phone').value;
+
+    if (/^09\d{9}$/.test(phoneNumber)) {
+        phoneNumber = '63' + phoneNumber.substring(1);
+    } else if (!/^639\d{9}$/.test(phoneNumber)) {
+        alert('Please enter a valid phone number (starting with 09XXXXXXXXX or 639XXXXXXXXX).');
+        return;
+    }
+
+    const smsProvider = 0; // You can change this value as needed
+
+    try {
+        const response = await fetch('sms_otp.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ phone: phoneNumber, sms_provider: smsProvider }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert('OTP sent successfully!');
+            document.getElementById('otp-section').style.display = 'block';
+            localStorage.setItem('otp', result.otp);
+            startTimer(60);
+        } else {
+            alert('Error sending OTP. Please try again.');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('An unexpected error occurred.');
+    }
+});
+
+document.getElementById('validate-otp-btn').addEventListener('click', function () {
+    const otpInput = document.getElementById('otp').value;
+
+    if (otpInput === localStorage.getItem('otp')) {
+        showSuccessModal(); // Show the modal if OTP is correct
+        document.getElementById('otp-result').textContent = 'Phone number verified.';
+    } else {
+        alert('Invalid OTP. Please try again.');
+    }
+});
+
+// Countdown Timer
+function startTimer(duration) {
+    let timer = duration;
+    const timerDisplay = document.getElementById('timer');
+    const countdown = setInterval(() => {
+        const minutes = Math.floor(timer / 120);
+        const seconds = timer % 120;
+        timerDisplay.textContent = `Resend OTP in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+        if (--timer < 0) {
+            clearInterval(countdown);
+            timerDisplay.textContent = 'You can resend the OTP now.';
+        }
+    }, 1000);
+}
+
+// Show Modal for OTP Success
+function showSuccessModal() {
+    const modalHtml = `
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <h2>Verification Successful!</h2>
+                <p>Your OTP has been verified successfully.</p>
+                <button id="close-modal-btn">Close</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    document.getElementById('close-modal-btn').addEventListener('click', function () {
+        document.querySelector('.modal-overlay').remove();
+    });
+}
+
+
+</script>
           <div class="col-md-6">
             <label for="email" class="form-label">Email Address</label>
             <input type="email" class="form-control" id="email" name="email" required>
           </div>
         </div>
-
         <div class="row mb-3">
-  <div class="col-md-12">
-    <label for="address" class="form-label">Address</label>
-    <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
-  </div>
-</div>
+          <div class="col-md-12">
+            <label for="address" class="form-label">Address</label>
+            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+          </div>
+        </div>
         <div class="row mb-3">
-  <div class="col-md-6">
-    <label for="gender" class="form-label">Gender</label>
-    <select class="form-select" id="gender" name="gender" required>
-      <option value="">Select Gender</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-      <option value="Other">Other</option>
-    </select>
-  </div>
-</div>
+          <div class="col-md-6">
+            <label for="gender" class="form-label">Gender</label>
+            <select class="form-select" id="gender" name="gender" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="password" class="form-label">Password</label>
@@ -181,15 +216,51 @@ $conn->close();
             <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
           </div>
         </div>
-        <div class="mb-3">
-          <input type="checkbox" id="terms" name="terms" required>
-          <label for="terms">I agree to the terms and conditions</label>
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+          <label class="form-check-label" for="terms">
+            I agree to the <a href="#" class="privacy-link" data-bs-toggle="modal" data-bs-target="#privacyModal">terms and conditions</a>.
+          </label>
         </div>
         <div class="d-flex gap-3">
           <button type="submit" class="btn btn-primary">Sign Up</button>
-          <button type="button" class="btn btn-secondary">Sign In</button>
+          <a href="user_login.php"><p>Already have an account? Login here</p></a>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Privacy and Policy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="privacyModalLabel">Privacy and Policy</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h4>1. Introduction</h4>
+        <p>We are committed to protecting your privacy. This policy outlines how we collect, use, and safeguard your personal information.</p>
+
+        <h4>2. Information We Collect</h4>
+        <p>We collect information such as your name, email address, phone number, and address when you register on our site.</p>
+
+        <h4>3. How We Use Your Information</h4>
+        <p>Your information is used to provide and improve our services, communicate with you, and ensure the security of your account.</p>
+
+        <h4>4. Data Security</h4>
+        <p>We implement industry-standard security measures to protect your data from unauthorized access, alteration, or disclosure.</p>
+
+        <h4>5. Your Rights</h4>
+        <p>You have the right to access, update, or delete your personal information at any time by contacting us.</p>
+
+        <h4>6. Changes to This Policy</h4>
+        <p>We may update this policy from time to time. Any changes will be posted on this page.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
 </div>

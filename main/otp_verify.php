@@ -15,8 +15,8 @@ if (isset($_SESSION['otp_expiry']) && time() > $_SESSION['otp_expiry']) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['otp'])) {
-    $userOTP = $_POST['otp'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userOTP = implode('', $_POST['otp']);
 
     if ($userOTP == $_SESSION['otp']) {
         $_SESSION['email_verified'] = true;
@@ -54,17 +54,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['otp'])) {
         h1 {
             color: #333;
         }
+        .otp-input-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
         .otp-input {
-            padding: 10px;
-            font-size: 18px;
-            width: 100%;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 20px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            margin: 10px 0;
         }
         button {
-            background-color:  #ffc107;
-            ;
+            background-color: #ffc107;
             color: black;
             border: none;
             padding: 12px 20px;
@@ -72,7 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['otp'])) {
             border-radius: 8px;
             font-size: 16px;
         }
-    
+        button:hover {
+            background-color: black;
+            color: white;
         }
         .timer {
             color: #d9534f;
@@ -89,26 +96,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['otp'])) {
         }
     </style>
     <script>
-        let timer = 50;
-        const countdownElement = () => {
+        let timer = 50; // Set the timer in seconds
+        const countdownElement = document.getElementById('timer-display');
+
+        function startCountdown() {
             const timerDisplay = document.getElementById('timer-display');
-            if (timer > 0) {
-                timer--;
-                timerDisplay.textContent = `Please wait ${timer} seconds to input the OTP.`;
-            } else {
-                alert("Time's up! Please request a new OTP.");
-                window.location.href = "otp_request.php";
+            const countdown = setInterval(() => {
+                if (timer > 0) {
+                    timer--;
+                    timerDisplay.textContent = `Please input the OTP within ${timer} seconds.`;
+                } else {
+                    clearInterval(countdown);
+                    alert("Time's up! Please request a new OTP.");
+                    window.location.href = "otp_request.php";
+                }
+            }, 1000);
+        }
+
+        function moveToNextInput(event) {
+            const input = event.target;
+            const maxLength = input.maxLength;
+            if (input.value.length === maxLength) {
+                const nextInput = input.nextElementSibling;
+                if (nextInput) nextInput.focus();
             }
-        };
-        setInterval(countdownElement, 1000);
+        }
+
+        function handleBackspace(event) {
+            if (event.key === 'Backspace' && event.target.value === '') {
+                const previousInput = event.target.previousElementSibling;
+                if (previousInput) previousInput.focus();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.otp-input').forEach(input => {
+                input.addEventListener('input', moveToNextInput);
+                input.addEventListener('keydown', handleBackspace);
+            });
+            startCountdown(); // Start the countdown timer
+        });
     </script>
 </head>
 <body>
     <div class="container">
         <h1>Enter Verification Code</h1>
-        <p>Your verification code is sent by Gmail to <p class="text-bold text-warning"><?php echo $_SESSION['otp_email']; ?></p></p>
+        <p>Your verification code was sent to <span class="text-bold text-warning"><?php echo $_SESSION['otp_email']; ?></span></p>
         <form method="POST">
-            <input type="text" name="otp" class="otp-input" placeholder="Enter OTP" required maxlength="6">
+            <div class="otp-input-group">
+                <?php for ($i = 0; $i < 6; $i++): ?>
+                    <input type="text" name="otp[]" class="otp-input" maxlength="1" required>
+                <?php endfor; ?>
+            </div>
             <div id="timer-display" class="timer"></div>
             <button type="submit">Verify OTP</button>
         </form>

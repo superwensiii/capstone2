@@ -6,25 +6,9 @@
     <title>Your Cart</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/cart.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
-    
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-        }
-        .cart-container {
-            margin: 30px auto;
-        }
-        .cart-header {
-            background-color: #ff5e14;
-            color: white;
-            text-align: center;
-            padding: 10px;
-        }
-    </style>
 </head>
 <body>
 
@@ -99,10 +83,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['index'
         }
     }
 }
-
-
-
-
 // Handle updating quantities
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_cart'])) {
     if (isset($_POST['quantities']) && is_array($_POST['quantities'])) {
@@ -133,9 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_cart'])) {
               </div>';
     }
 }
-    
-
-
 // Fetch updated cart
 $cart = $_SESSION['cart'];
 ?>
@@ -213,11 +190,6 @@ $cart = $_SESSION['cart'];
         <?php endif; ?>
     </div>
 </div>
-
-
-
-
-
 <!-- Bootstrap JS + Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>

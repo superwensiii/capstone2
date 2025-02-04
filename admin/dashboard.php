@@ -84,7 +84,7 @@ if (isset($_SESSION['id'])):
                 <li><a class="nav-link" href="view_orders.php"><i class="fa-solid fa-receipt icon"></i> All Orders</a></li>
 <li><a class="nav-link" href="#"><i class="fa-solid fa-clock icon"></i> Pending</a></li>
 <li><a class="nav-link" href="#"><i class="fa-solid fa-check-circle icon"></i> Completed</a></li>
-<li><a class="nav-link" href="cancelled_products.php"><i class="fa-solid fa-ban icon"></i> Cancelled</a></li>
+<li><a class="nav-link" href="cancelled_order.php"><i class="fa-solid fa-ban icon"></i> Cancelled</a></li>
 <li><a class="nav-link" href="#"><i class="fa-solid fa-truck icon"></i> Shipments</a></li>
 <li><a class="nav-link" href="#"><i class="fa-solid fa-wallet icon"></i> Transactions</a></li>
 

@@ -61,7 +61,7 @@ $result = $stmt->get_result();
     if (!empty($image_path)) {
         // If the path is relative, prepend the base URL
         if (!filter_var($image_path, FILTER_VALIDATE_URL)) {
-            $image_path = "http://localhost/core2/" . $image_path;
+            $image_path = "http://localhost/capstone2/" . $image_path;
         }
 
         // Display the image

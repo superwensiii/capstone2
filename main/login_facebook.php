@@ -10,8 +10,17 @@ $fb = new Facebook\Facebook([
 ]);
 
 $helper = $fb->getRedirectLoginHelper();
-$loginUrl = $helper->getLoginUrl('http://localhost/capstone2/index.php', ['email']);
+$loginUrl = $helper->getLoginUrl('http://localhost/capstone2/index.php', ['email']); // Redirect back to login.php
+
+if(isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit();
+}
+
+
 
 header('Location: ' . $loginUrl);
 exit();
 ?>
+
+

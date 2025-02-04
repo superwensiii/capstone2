@@ -6,6 +6,8 @@
 
 ?>
 
+
+
 <?php
 // Fetch all products initially
 $sql = "SELECT * FROM products"; 

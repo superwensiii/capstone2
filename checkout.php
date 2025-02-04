@@ -30,11 +30,6 @@ $response = $client->request('POST', 'https://api.paymongo.com/v1/links', [
     'content-type' => 'application/json',
   ],
 ]);
-
-
-
-
-
  // echo $response->getBody(); 
 
 $user_id = $_SESSION['user_id'];
@@ -180,13 +175,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
-
-            <!-- Shop Voucher Section -->
-    <!-- Modal for Payment Options -->
-<!-- Modal for Payment Options -->
-
-
-<!-- Payment Options Section (now visible on screen) -->
 <div class="card mb-4">
     <div class="card-body">
         <h5 class="card-title text-center">Choose Payment Method</h5>

@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
         // Content
         $mail->isHTML(true); // Set email format to HTML
         $mail->Subject = 'Your OTP for Registration';
-        $mail->Body = "Your OTP is: <b>$otp</b>";
-        $mail->AltBody = "Your OTP is: $otp";
+        $mail->Body = "Eto yung Code tanga tanga ka ba?:: <b>$otp</b>";
+        $mail->AltBody = "Eto yung Code tanga tanga ka ba?:: $otp";
 
         // Send the email
         $mail->send();
@@ -102,13 +102,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
             width: 100%;
             padding: 10px;
             border-radius: 5px;
-            background-color: yellow;
+            background-color: #ffc107;
             border: none;
             color: black;
             font-size: 16px;
         }
         .otp-container .btn:hover {
-            background-color: gray;
+            background-color: black;
+            color: white;
         }
         .privacy-policy {
             margin-top: 20px;

@@ -1,6 +1,6 @@
 <?php
 require_once '../vendor/autoload.php';
-require_once '../db/connect.php'; // Include your database connection file
+require_once '../db/connect.php'; // Ensure this path is correct for your database connection file
 
 session_start();
 
@@ -13,41 +13,58 @@ $fb = new Facebook\Facebook([
 $helper = $fb->getRedirectLoginHelper();
 
 try {
-    // Get the access token
     $accessToken = $helper->getAccessToken();
 
-    // Get the user's profile information
+    if (!isset($accessToken)) {
+        throw new Exception("Failed to get access token.");
+    }
+
+    // Get user profile from Facebook
     $response = $fb->get('/me?fields=id,name,email', $accessToken);
     $user = $response->getGraphUser();
 
     // Extract user data
     $facebookId = $user->getId();
     $name = $user->getName();
-    $email = $user->getEmail();
+    $email = $user->getEmail() ?? 'No email provided'; // Handle missing email gracefully
 
-    // Check if the user already exists in the database
-    $stmt = $conn->prepare("SELECT id FROM loginauth WHERE facebook_id = ?");
+    // Database connection debug
+    if ($conn->connect_error) {
+        die("Database connection failed: " . $conn->connect_error);
+    }
+
+    // Check if the user already exists in the facebook_users table
+    $stmt = $conn->prepare("SELECT id FROM facebook_users WHERE facebook_id = ?");
+    if (!$stmt) {
+        die("Database error: " . $conn->error);
+    }
     $stmt->bind_param("s", $facebookId);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows === 0) {
-        // Insert new user into the database
-        $stmt = $conn->prepare("INSERT INTO loginauth (facebook_id, name, email) VALUES (?, ?, ?)");
+        // Insert new Facebook user into the database
+        $stmt = $conn->prepare("INSERT INTO facebook_users (facebook_id, name, email) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $facebookId, $name, $email);
-        $stmt->execute();
+
+        if (!$stmt->execute()) {
+            die("Database Insert Error: " . $stmt->error);
+        }
+        $_SESSION['user_id'] = $conn->insert_id; // Get the last inserted ID
+    } else {
+        $stmt->bind_result($existingUserId);
+        $stmt->fetch();
+        $_SESSION['user_id'] = $existingUserId; // Use the existing user ID
     }
 
     // Store user info in session
-    $_SESSION['user_id'] = $stmt->insert_id ?? $stmt->fetch()->id; // Use the newly inserted ID or existing ID
-    $_SESSION['user_name'] = $name;
+    $_SESSION['full_name'] = $name;
     $_SESSION['user_email'] = $email;
 
-    // Redirect to index.php
-    header('Location: iindex.php');
+    // Redirect to the homepage or any desired page
+    header('Location: index.php');
     exit();
 } catch (Exception $e) {
-    // Handle error
     echo "Error: " . $e->getMessage();
     header('Location: user_login.php');
     exit();
